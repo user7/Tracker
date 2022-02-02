@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gb.tracker.App
+import com.gb.tracker.AppScreens
 import com.gb.tracker.IBackListener
 import com.gb.tracker.databinding.TrackerFragmentBinding
 import moxy.MvpAppCompatFragment
@@ -18,8 +19,10 @@ class TrackerFragment : MvpAppCompatFragment(), TrackerView, IBackListener {
         fun newInstance() = TrackerFragment()
     }
 
+    override fun backPressed() = presenter.backPressed()
+
     private val presenter: TrackerPresenter by moxyPresenter {
-        TrackerPresenter(App.instance.router)
+        TrackerPresenter(App.instance.router, AppScreens())
     }
 
     private var _binding: TrackerFragmentBinding? = null
@@ -45,6 +48,7 @@ class TrackerFragment : MvpAppCompatFragment(), TrackerView, IBackListener {
         binding.stopButton.setOnClickListener { presenter.stopPressed() }
         binding.commitButton.setOnClickListener { presenter.commitPressed() }
         binding.discardButton.setOnClickListener { presenter.discardPressed() }
+        binding.editEntitiesButton.setOnClickListener { presenter.editEntitiesButtonPressed() }
     }
 
     override fun setDisplay(text: String) {
@@ -61,8 +65,6 @@ class TrackerFragment : MvpAppCompatFragment(), TrackerView, IBackListener {
         val r = RingtoneManager.getRingtone(requireContext(), notification)
         r.play()
     }
-
-    override fun backPressed() = presenter.backPressed()
 
     private fun setVisible(view: View, visible: Boolean) {
         view.visibility = if (visible) View.VISIBLE else View.GONE

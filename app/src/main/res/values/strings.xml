@@ -4,4 +4,5 @@
     <string name="stop">Stop</string>
     <string name="commit">Commit</string>
     <string name="discard">Discard</string>
+    <string name="fab_entities_description">To entities screen</string>
 </resources>

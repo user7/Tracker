@@ -3,12 +3,20 @@ package com.gb.tracker.screens.tracker
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.gb.tracker.IAppScreens
 import com.github.terrakok.cicerone.Router
 import moxy.MvpPresenter
 import java.util.*
 
 
-class TrackerPresenter(private val router: Router) : MvpPresenter<TrackerView>() {
+class TrackerPresenter(private val router: Router, private val screens: IAppScreens) :
+    MvpPresenter<TrackerView>() {
+
+    fun backPressed(): Boolean {
+        router.exit()
+        return true
+    }
+
     data class TimerInterval(val startMs: Long, val endMs: Long)
 
     private var timerInterval: TimerInterval? = null
@@ -34,9 +42,8 @@ class TrackerPresenter(private val router: Router) : MvpPresenter<TrackerView>()
         viewState.setDisplay(display)
     }
 
-    fun backPressed(): Boolean {
-        router.exit()
-        return true
+    fun editEntitiesButtonPressed() {
+        router.navigateTo(screens.entities())
     }
 
     fun startPressed() {
