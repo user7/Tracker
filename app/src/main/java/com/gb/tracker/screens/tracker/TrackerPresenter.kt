@@ -34,7 +34,7 @@ class TrackerPresenter(private val router: Router, private val screens: IAppScre
     private fun setDisplay(lengthMs: Long) {
         val secs = lengthMs / 1000 % 60
         val mins = lengthMs / 1000 / 60 % 60
-        val hours = lengthMs / 1000 / 60 / 60 % 60
+        val hours = lengthMs / 1000 / 60 / 60
         val display = when {
             hours > 0 -> "%d:%02d:%02d".format(hours, mins, secs)
             mins > 0 -> "%d:%02d".format(mins, secs)
