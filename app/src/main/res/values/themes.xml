@@ -13,4 +13,17 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="StyleTimerDisplay">
+        <item name="android:textSize">100dp</item>
+    </style>
+
+    <style name="StyleTimerButton">
+        <item name="android:textSize">60dp</item>
+    </style>
+
+    <style name="StyleUnimplemented">
+        <item name="android:textSize">20dp</item>
+        <item name="android:textColor">#FFBB0000</item>
+    </style>
 </resources>
