@@ -55,4 +55,26 @@ class ExampleUnitTest {
         }
         Thread.sleep(1000)
     }
+
+    @Test
+    fun rxJavaFlatMap() {
+        var out: Long = 0
+        Observable
+            .just(1, 20, 300)
+            .flatMap { x -> Observable.just(x, x * 1000).delay(10, TimeUnit.MILLISECONDS) }
+            .subscribe { x -> out += x }
+        Thread.sleep(100)
+        assertEquals(321321, out)
+    }
+
+    @Test
+    fun rxJavaSwitchMap() {
+        var out: Long = 0
+        Observable
+            .just(1, 20, 300)
+            .switchMap { x -> Observable.just(x, x * 1000).delay(10, TimeUnit.MILLISECONDS) }
+            .subscribe { x -> out += x }
+        Thread.sleep(100)
+        assertEquals(300300, out)
+    }
 }
