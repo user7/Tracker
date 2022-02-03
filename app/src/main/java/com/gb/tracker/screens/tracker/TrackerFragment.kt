@@ -1,7 +1,6 @@
 package com.gb.tracker.screens.tracker
 
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -61,9 +60,10 @@ class TrackerFragment : MvpAppCompatFragment(), TrackerView, IBackListener {
     override fun showDiscard(show: Boolean) = setVisible(binding.discardButton, show)
 
     override fun playAlarm() {
-        val notification: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val r = RingtoneManager.getRingtone(requireContext(), notification)
-        r.play()
+        RingtoneManager.getRingtone(
+            requireContext(),
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        ).play()
     }
 
     private fun setVisible(view: View, visible: Boolean) {
