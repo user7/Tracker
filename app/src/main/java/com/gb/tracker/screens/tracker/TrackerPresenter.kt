@@ -6,7 +6,8 @@ import android.util.Log
 import com.gb.tracker.IAppScreens
 import com.github.terrakok.cicerone.Router
 import moxy.MvpPresenter
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 
 
 class TrackerPresenter(private val router: Router, private val screens: IAppScreens) :
