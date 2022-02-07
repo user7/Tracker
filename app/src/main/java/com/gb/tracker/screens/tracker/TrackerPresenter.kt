@@ -1,13 +1,13 @@
 package com.gb.tracker.screens.tracker
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.gb.tracker.IAppScreens
 import com.github.terrakok.cicerone.Router
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 import moxy.MvpPresenter
-import java.util.Timer
-import java.util.TimerTask
+import java.util.concurrent.TimeUnit
 
 
 class TrackerPresenter(private val router: Router, private val screens: IAppScreens) :
@@ -21,10 +21,8 @@ class TrackerPresenter(private val router: Router, private val screens: IAppScre
     data class TimerInterval(val startMs: Long, val endMs: Long)
 
     private var timerInterval: TimerInterval? = null
-    private var intervalLengthMs: Long = 300_000
+    private var intervalLengthMs: Long = 5_000
     private var committedIntervals = mutableListOf<TimerInterval>()
-    private var nextSecondMs: Long = 0
-    private var timer: Timer? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -49,43 +47,47 @@ class TrackerPresenter(private val router: Router, private val screens: IAppScre
 
     fun startPressed() {
         val ts = System.currentTimeMillis()
-        nextSecondMs = ts
-        timerInterval = TimerInterval(ts, ts + intervalLengthMs)
+        val thisInterval = TimerInterval(ts, ts + intervalLengthMs)
+        timerInterval = thisInterval
         viewState.showStart(false)
         viewState.showStop(true)
         viewState.showCommit(false)
         viewState.showDiscard(false)
-        setTimerForNextSecond()
-    }
 
-    private fun setTimerForNextSecond() {
-        val interval = timerInterval
-        if (interval == null) {
-            Log.d("==", "timer fired unexpectedly")
-            return
-        }
+        var disposable: Disposable? = null
+        disposable = Observable.interval(1, TimeUnit.SECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { tick ->
+                    val curTs = System.currentTimeMillis()
+                    val dts = curTs - ts
+                    Log.d("==", "second $tick dts=${dts / 1000.0}")
 
-        val ts = System.currentTimeMillis()
-        if (ts >= interval.endMs) {
-            setDisplay(0)
-            viewState.showStart(false)
-            viewState.showStop(false)
-            viewState.showCommit(true)
-            viewState.showDiscard(true)
-            viewState.playAlarm()
-            return
-        }
+                    // таймер был перезапущен или сброщен, завершить этот поток
+                    if (thisInterval !== timerInterval) {
+                        disposable?.dispose()
+                        return@subscribe
+                    }
 
-        if (ts >= nextSecondMs) {
-            setDisplay(interval.endMs - nextSecondMs)
-            nextSecondMs += 1000
-        }
+                    // время вышло
+                    if (curTs >= thisInterval.endMs) {
+                        setDisplay(0)
+                        viewState.showStart(false)
+                        viewState.showStop(false)
+                        viewState.showCommit(true)
+                        viewState.showDiscard(true)
+                        viewState.playAlarm()
+                        disposable?.dispose()
+                        return@subscribe
+                    }
 
-        Timer().apply { timer = this }.schedule(object : TimerTask() {
-            override fun run() {
-                Handler(Looper.getMainLooper()).post { setTimerForNextSecond() }
-            }
-        }, nextSecondMs - ts)
+                    // просто обновить дисплей
+                    setDisplay((thisInterval.endMs - curTs + 500) / 1000 * 1000)
+                },
+                { error ->
+                    Log.d("==", "exception: ${error.message}")
+                }
+            )
     }
 
     fun stopPressed() {
